@@ -1,14 +1,7 @@
 import 'module-alias/register';
 import * as dotenv from 'dotenv';
 dotenv.config();
-import { ExpressServer } from './app/ExpressServer';
-import { SocketServer } from './app/SocketServer';
-import { MySQLClient } from './app/MySQLClient';
-import { Scoreboard3 } from './app/Scoreboard3/Scoreboard3';
-
-//Setup Database (MySQL) Client
-let mySQLClient = new MySQLClient(process.env.MYSQL_HOST || 'localhost', process.env.MYSQL_USER || 'root', process.env.MYSQL_PASS || '', process.env.MYSQL_DB || 'weeb-db');
-mySQLClient.start();
+import { ExpressServer, SocketServer, Scoreboard3, Firebase } from '@yukiTenshi/app';
 
 //Bypass CORS
 let bypass_cors: object = typeof process.env.BYPASS_CORS != 'undefined' && process.env.BYPASS_CORS == 'TRUE' ? {
@@ -25,6 +18,10 @@ expressServer.start();
 let socketServer: SocketServer = new SocketServer(expressServer, bypass_cors);
 socketServer.start();
 
+//Setup Firebase client
+let firebase: Firebase = new Firebase();
+firebase.start();
+
 //[FINAL] Start yukiTenshi app
-let scoreboardTenshi = new Scoreboard3(expressServer, socketServer, mySQLClient);
+let scoreboardTenshi = new Scoreboard3(expressServer, socketServer, firebase);
 scoreboardTenshi.start();
