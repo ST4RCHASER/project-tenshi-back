@@ -4,7 +4,7 @@ dotenv.config();
 import { ExpressServer } from './app/ExpressServer';
 import { SocketServer } from './app/SocketServer';
 import { MySQLClient } from './app/MySQLClient';
-import { App } from './app/App/App';
+import { Scoreboard3 } from './app/Scoreboard3/Scoreboard3';
 
 //Setup Database (MySQL) Client
 let mySQLClient = new MySQLClient(process.env.MYSQL_HOST || 'localhost', process.env.MYSQL_USER || 'root', process.env.MYSQL_PASS || '', process.env.MYSQL_DB || 'weeb-db');
@@ -26,5 +26,5 @@ let socketServer: SocketServer = new SocketServer(expressServer, bypass_cors);
 socketServer.start();
 
 //[FINAL] Start yukiTenshi app
-let yukiTenshi = new App(expressServer, socketServer, mySQLClient);
-yukiTenshi.start();
+let scoreboardTenshi = new Scoreboard3(expressServer, socketServer, mySQLClient);
+scoreboardTenshi.start();

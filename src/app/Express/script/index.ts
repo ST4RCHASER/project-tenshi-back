@@ -2,13 +2,10 @@ import express from 'express';
 import { RESTResp } from '@yukiTenshi/utils'
 const router = express.Router();
 router.all('/', (_, res) => {
-    const response: RESTResp<object> = {
+    const response: RESTResp<never> = {
         success: true,
         statusCode: 200,
-        message: 'Welcome to Yuki-Tenshi project!',
-        content: {
-            guide: "You can change this message by edit file in: app/Express/script/index.ts"
-        }
+        message: 'Welcome to Project-Tenshi project!',
     }
     res.status(200).send(response)
 })

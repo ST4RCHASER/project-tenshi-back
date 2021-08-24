@@ -1,17 +1,17 @@
 {
-  "name": "yuki-tenshi",
+  "name": "project-tenshi-back",
   "version": "1.0.0",
-  "description": "an socketio and express template server",
+  "description": "an scoreboard v3 app backend",
   "main": "./src/server.ts",
   "scripts": {
     "build": "tsc --build",
     "start": "node ./build/server",
     "serve": "tsc --build && node ./build/server",
-    "dev": "ts-node-dev ./src/server.ts",
+    "dev": "yarn build && ts-node-dev ./src/server.ts",
     "test": "echo true"
   },
   "author": "ST4RCHASER",
-  "license": "GPL3",
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
