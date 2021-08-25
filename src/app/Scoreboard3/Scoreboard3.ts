@@ -1,7 +1,7 @@
 import { ExpressServer, SocketServer, Firebase } from '@yukiTenshi/app';
 import { LogType, LogLevel, Logger } from '@yukiTenshi/utils';
 import { Game } from './Games/Game';
-import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent } from './events';
+import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent } from './events';
 import { Basketball } from './Games';
 export class Scoreboard3 {
     private expressServer: ExpressServer;
@@ -25,6 +25,7 @@ export class Scoreboard3 {
         this.socketServer.registerEvent(new clientConnectedEvent());
         this.socketServer.registerEvent(new clientDisconnectEvent());
         this.socketServer.registerEvent(new clientRequestScoreEvent());
+        this.socketServer.registerEvent(new clientTeamUpdateEvent());
         this.log("Server started");
         this.loadAllScores();
         // setTimeout(() => { console.log(this.getScoreList()) }, 1000);
