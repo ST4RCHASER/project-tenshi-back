@@ -10,6 +10,7 @@ export class Scoreboard3 {
     private logger: Logger;
     private scoreList: Game[]
     private lastSave: Game[]
+    private adminList: string[];
     constructor(expressServer: ExpressServer, socketServer: SocketServer, firebase: Firebase) {
         this.expressServer = expressServer;
         this.socketServer = socketServer;
@@ -80,5 +81,11 @@ export class Scoreboard3 {
     }
     getScoreList() {
         return this.scoreList;
+    }
+    getScoreByID(id: string): Game | undefined {
+        return this.scoreList.find(x => x.getId() == id);
+    }
+    isInAdminList(socketID: string): boolean {
+        return this.adminList.find(x => x == socketID) != null;
     }
 }

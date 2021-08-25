@@ -14,14 +14,30 @@ export class SocketSender {
     public getJSONText(): string {
         return '';
     }
-    public send(targetSocket: Socket): any {
+    public sendToAll(socket: Socket): any {
         try {
             let data: any = this.responseData as any;
             data.status = this.responseCode == 200;
             data.code = this.responseCode;
             data.message = this.responseMessage;
             data.stamp = new Date().getTime();
-            targetSocket.emit(this.name, data);
+            socket.broadcast.emit(this.name, data);
+            return { success: true, message: `Emit "${this.name}" send to all successfully` };
+        } catch (e: any) {
+            console.error(e);
+            return { success: false, message: `Emit "${this.name}" send to all error: ${e.message}` };
+        }
+    }
+    private getObject(): any {
+        let data: any = this.responseData as any;
+        data.status = this.responseCode == 200;
+        data.code = this.responseCode;
+        data.message = this.responseMessage;
+        data.stamp = new Date().getTime();
+    }
+    public send(targetSocket: Socket): any {
+        try {
+            targetSocket.emit(this.name, this.getObject());
             return { success: true, message: `Emit "${this.name}" send successfully` };
         } catch (e: any) {
             console.error(e);
