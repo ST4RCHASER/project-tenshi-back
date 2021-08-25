@@ -3,7 +3,7 @@ import { getFirebaseConfig } from './scripts/getFirebaseConfig';
 export class Firebase {
     firebaseApp: app.App;
     constructor() {
-
+        this.firebaseApp
     }
     start(): Firebase {
         this.firebaseApp = firebase.initializeApp(getFirebaseConfig());
@@ -17,5 +17,8 @@ export class Firebase {
     }
     ref(name: string): firebase.database.Reference {
         return this.db().ref(name);
+    }
+    set(ref: firebase.database.Reference, newData: any) {
+        ref.set(newData);
     }
 }

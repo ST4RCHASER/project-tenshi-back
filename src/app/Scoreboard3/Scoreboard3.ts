@@ -1,14 +1,17 @@
 import { ExpressServer, SocketServer, Firebase } from '@yukiTenshi/app';
 import { LogType, LogLevel, Logger } from '@yukiTenshi/utils';
-import { clientConnectedEvent } from './events/clientConnectedEvent';
-import { clientDisconnectEvent } from './events/clientDisconnectEvent';
+import { Game } from './Games/Game';
+import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent } from './events';
+import { Basketball } from './Games';
 export class Scoreboard3 {
-    private httpServer: ExpressServer;
+    private expressServer: ExpressServer;
     private socketServer: SocketServer;
     private firebase: Firebase;
     private logger: Logger;
-    constructor(httpServer: ExpressServer, socketServer: SocketServer, firebase: Firebase) {
-        this.httpServer = httpServer;
+    private scoreList: Game[]
+    private lastSave: Game[]
+    constructor(expressServer: ExpressServer, socketServer: SocketServer, firebase: Firebase) {
+        this.expressServer = expressServer;
         this.socketServer = socketServer;
         this.firebase = firebase;
         this.logger = new Logger();
@@ -20,13 +23,62 @@ export class Scoreboard3 {
         //Register event
         this.socketServer.registerEvent(new clientConnectedEvent());
         this.socketServer.registerEvent(new clientDisconnectEvent());
+        this.socketServer.registerEvent(new clientRequestScoreEvent());
         this.log("Server started");
-        
+        this.loadAllScores();
+        // setTimeout(() => { console.log(this.getScoreList()) }, 1000);
+        setInterval(() => {
+            if (this.scoreList != this.lastSave) {
+                this.log("Starting auto save...");
+                let list: any = {};
+                for (const singleScore of this.getScoreList()) {
+                    list[singleScore.getId()] = singleScore;
+                    list[singleScore.getId()].gameType = singleScore.getType();
+                }
+                this.getFirebase().ref('scoreLists').set(list).then(() => {
+                    this.log("Auto saved complete!");
+                    this.lastSave = this.scoreList;
+                });
+            }
+        }, 1000 * 60);
     }
     public self(): Scoreboard3 {
         return this;
     }
     public log(message: string, level: LogLevel = LogLevel.INFO): void {
         this.logger.raw(level, LogType.APP, message);
+    }
+    public getFirebase(): Firebase {
+        return this.firebase;
+    }
+    public getExpress(): ExpressServer {
+        return this.expressServer;
+    }
+    private loadAllScores(): void {
+        this.scoreList = [];
+        let gameList = this.getFirebase().ref('scoreLists');
+        let _ = this;
+        gameList.once('value', (snapshot) => {
+            snapshot.forEach(function (childSnapshot) {
+                let childKey = childSnapshot.key;
+                let childData = childSnapshot.val();
+                if (childKey != null) {
+                    let game: Game;
+                    switch (childData.gameType) {
+                        case 1:
+                            game = new Basketball(childKey);;
+                            break;
+                        default:
+                            game = new Game(childKey);
+                    }
+                    game.setChildData(childData);
+                    _.log("Score (" + game.getType() + ") id: " + childKey + " loaded!");
+                    _.scoreList.push(game)
+                }
+            });
+        })
+    }
+    getScoreList() {
+        return this.scoreList;
     }
 }

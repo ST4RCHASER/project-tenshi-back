@@ -3,6 +3,7 @@ import { Server, Socket } from "socket.io";
 import { ExpressServer } from "./ExpressServer";
 import { SocketEvent } from "@yukiTenshi/utils";
 import { SocketSender } from "@yukiTenshi/utils";
+import { Scoreboard3 } from "./Scoreboard3/Scoreboard3";
 export class SocketServer {
     private logger: Logger = new Logger();
     private expressServer: ExpressServer;
@@ -68,10 +69,10 @@ export class SocketServer {
             this.log(`Event "${event.Name}" skip to register because this event disable in class`, LogLevel.WARN);
         }
     }
-    public getApp(): any {
+    public getApp(): Scoreboard3 {
         return this.app;
     }
-    public setApp(app: any) {
+    public setApp(app: Scoreboard3) {
         this.app = app;
         return this;
     }

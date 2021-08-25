@@ -1,5 +1,6 @@
 import { SocketServer } from "@yukiTenshi/app";
 import { SocketEvent, SocketSender } from "@yukiTenshi/utils";
+import { Basketball } from "../Games";
 import { Socket } from "socket.io";
 export class clientConnectedEvent implements SocketEvent {
     Enable: boolean = true;
