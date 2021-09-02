@@ -5,7 +5,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 bin
-
+.yarn
+yarn.lock
+.yarnrc.yml
 # Runtime data
 pids
 *.pid
