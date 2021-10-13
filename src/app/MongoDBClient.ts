@@ -1,13 +1,19 @@
 
 import mongoose, { Mongoose, Schema, Model } from "mongoose";
 import { ModelType, Logger, LogType, LogLevel } from "@yukiTenshi/utils";
+import { Scoreboard3 } from ".";
 export class MongoDBClient {
     private logger: Logger = new Logger();
     public connString: string;
     private connection: Mongoose;
     private models: Model<any>[] = [];
+    private app: Scoreboard3;
     constructor(connString: string) {
         this.connString = connString;
+    }
+    public setApp(scoreboard3: Scoreboard3) {
+        this.app = scoreboard3;
+        return this;
     }
     async start() {
         try {
@@ -15,6 +21,7 @@ export class MongoDBClient {
             (global as any).db = this;
             this.log(`connection created : ${this.connString}`)
             this.registerSchema();
+            this.app.start();
         } catch (e: any) {
             this.log(`connection failed : ${e.stack || e}`)
         }

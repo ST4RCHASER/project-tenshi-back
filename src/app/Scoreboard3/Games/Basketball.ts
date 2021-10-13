@@ -8,4 +8,7 @@ export class Basketball extends Game {
         this.quarter = newQuarter;
         return this;
     }
+    getQuarter() {
+        return this.quarter;
+    }
 }

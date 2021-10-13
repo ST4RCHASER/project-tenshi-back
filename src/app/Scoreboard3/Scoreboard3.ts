@@ -1,20 +1,20 @@
-import { ExpressServer, SocketServer, Firebase } from '@yukiTenshi/app';
-import { LogType, LogLevel, Logger } from '@yukiTenshi/utils';
+import { ExpressServer, SocketServer,MongoDBClient } from '@yukiTenshi/app';
+import { LogType, LogLevel, Logger, ModelType } from '@yukiTenshi/utils';
 import { Game } from './Games/Game';
 import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent } from './events';
 import { Basketball } from './Games';
 export class Scoreboard3 {
     private expressServer: ExpressServer;
     private socketServer: SocketServer;
-    private firebase: Firebase;
+    private mongodb: MongoDBClient;
     private logger: Logger;
     private scoreList: Game[]
     private lastSave: Game[]
     private adminList: string[];
-    constructor(expressServer: ExpressServer, socketServer: SocketServer, firebase: Firebase) {
+    constructor(expressServer: ExpressServer, socketServer: SocketServer, mongodb: MongoDBClient) {
         this.expressServer = expressServer;
         this.socketServer = socketServer;
-        this.firebase = firebase;
+        this.mongodb = mongodb;
         this.logger = new Logger();
         return this;
     }
@@ -32,15 +32,20 @@ export class Scoreboard3 {
         setInterval(() => {
             if (this.scoreList != this.lastSave) {
                 this.log("Starting auto save...");
-                let list: any = {};
+                let gameList = this.getMongoDB().getModel(ModelType.SCORES);
                 for (const singleScore of this.getScoreList()) {
-                    list[singleScore.getId()] = singleScore;
-                    list[singleScore.getId()].gameType = singleScore.getType();
+                    gameList.findByIdAndUpdate(singleScore.getId(),{
+                        gameType: singleScore.getType(), 
+                        name: singleScore.getName(),
+                        quater: (<Basketball> singleScore).getQuarter(),
+                        stamp: singleScore.getStamp(),
+                        state: singleScore.getState(),
+                        teams: singleScore.getTeams(),
+                        timer: singleScore.getTimer()
+                    })
                 }
-                this.getFirebase().ref('scoreLists').set(list).then(() => {
-                    this.log("Auto saved complete!");
-                    this.lastSave = this.scoreList;
-                });
+                this.log("Auto saved complete!");
+                this.lastSave = this.scoreList;
             }
         }, 1000 * 60);
     }
@@ -50,35 +55,30 @@ export class Scoreboard3 {
     public log(message: string, level: LogLevel = LogLevel.INFO): void {
         this.logger.raw(level, LogType.APP, message);
     }
-    public getFirebase(): Firebase {
-        return this.firebase;
+    public getMongoDB(): MongoDBClient {
+        return this.mongodb;
     }
     public getExpress(): ExpressServer {
         return this.expressServer;
     }
-    private loadAllScores(): void {
+    private async loadAllScores(): Promise<void> {
         this.scoreList = [];
-        let gameList = this.getFirebase().ref('scoreLists');
+        let gameList = this.getMongoDB().getModel(ModelType.SCORES);
         let _ = this;
-        gameList.once('value', (snapshot) => {
-            snapshot.forEach(function (childSnapshot) {
-                let childKey = childSnapshot.key;
-                let childData = childSnapshot.val();
-                if (childKey != null) {
-                    let game: Game;
-                    switch (childData.gameType) {
-                        case 1:
-                            game = new Basketball(childKey);;
-                            break;
-                        default:
-                            game = new Game(childKey);
-                    }
-                    game.setChildData(childData);
-                    _.log("Score (" + game.getType() + ") id: " + childKey + " loaded!");
-                    _.scoreList.push(game)
-                }
-            });
-        })
+        let data = await gameList.find({});
+        for (const score of data) {
+            let game: Game;
+            switch (score._id) {
+                case 1:
+                    game = new Basketball(score._id);;
+                    break;
+                default:
+                    game = new Game(score._id);
+            }
+            game.setChildData(score);
+            _.log("Score (" + game.getType() + ") id: " + score._id + " loaded!");
+            _.scoreList.push(game)
+        }
     }
     getScoreList() {
         return this.scoreList;

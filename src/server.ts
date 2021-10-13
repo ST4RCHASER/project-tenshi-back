@@ -1,7 +1,7 @@
 import 'module-alias/register';
 import * as dotenv from 'dotenv';
 dotenv.config();
-import { ExpressServer, SocketServer, Scoreboard3, Firebase } from '@yukiTenshi/app';
+import { ExpressServer, SocketServer, Scoreboard3, MongoDBClient } from '@yukiTenshi/app';
 
 //Bypass CORS
 let bypass_cors: object = typeof process.env.BYPASS_CORS != 'undefined' && process.env.BYPASS_CORS == 'TRUE' ? {
@@ -18,10 +18,7 @@ expressServer.start();
 let socketServer: SocketServer = new SocketServer(expressServer, bypass_cors);
 socketServer.start();
 
-//Setup Firebase client
-let firebase: Firebase = new Firebase();
-firebase.start();
-
+let mongod = new MongoDBClient(process.env.MONGO_CON_STR as string)
 //[FINAL] Start yukiTenshi app
-let scoreboardTenshi = new Scoreboard3(expressServer, socketServer, firebase);
-scoreboardTenshi.start();
+let scoreboardTenshi = new Scoreboard3(expressServer, socketServer, mongod);
+mongod.setApp(scoreboardTenshi);
