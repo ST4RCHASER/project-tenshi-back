@@ -34,8 +34,14 @@ export class MongoDBClient {
     }
     registerSchema(): void {
         const scores = new Schema({
-            data: Object
-        });
+            gameType: Number,
+            name: String,
+            stamp: Date,
+            state: Number,
+            teams: Schema.Types.Mixed,
+            timer: Number,
+            gameMeta: Schema.Types.Mixed,
+        }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
         this.models.push(this.getConnection().model('score', scores));
         this.log(`Schema registered : ${this.models.length}`);
     }

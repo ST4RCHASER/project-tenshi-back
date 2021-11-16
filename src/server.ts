@@ -22,3 +22,4 @@ let mongod = new MongoDBClient(process.env.MONGO_CON_STR as string)
 //[FINAL] Start yukiTenshi app
 let scoreboardTenshi = new Scoreboard3(expressServer, socketServer, mongod);
 mongod.setApp(scoreboardTenshi);
+mongod.start();

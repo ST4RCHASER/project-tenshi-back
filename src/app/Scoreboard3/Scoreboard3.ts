@@ -1,8 +1,9 @@
-import { ExpressServer, SocketServer,MongoDBClient } from '@yukiTenshi/app';
+import { ExpressServer, SocketServer, MongoDBClient } from '@yukiTenshi/app';
 import { LogType, LogLevel, Logger, ModelType } from '@yukiTenshi/utils';
 import { Game } from './Games/Game';
-import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent } from './events';
+import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent } from './events';
 import { Basketball } from './Games';
+import { GameType } from './types';
 export class Scoreboard3 {
     private expressServer: ExpressServer;
     private socketServer: SocketServer;
@@ -26,23 +27,16 @@ export class Scoreboard3 {
         this.socketServer.registerEvent(new clientDisconnectEvent());
         this.socketServer.registerEvent(new clientRequestScoreEvent());
         this.socketServer.registerEvent(new clientTeamUpdateEvent());
+        this.socketServer.registerEvent(new clientCreateScoreEvent());
         this.log("Server started");
         this.loadAllScores();
         // setTimeout(() => { console.log(this.getScoreList()) }, 1000);
-        setInterval(() => {
-            if (this.scoreList != this.lastSave) {
+        setInterval(async () => {
+            if (this.scoreList != this.lastSave || true) {
                 this.log("Starting auto save...");
                 let gameList = this.getMongoDB().getModel(ModelType.SCORES);
                 for (const singleScore of this.getScoreList()) {
-                    gameList.findByIdAndUpdate(singleScore.getId(),{
-                        gameType: singleScore.getType(), 
-                        name: singleScore.getName(),
-                        quater: (<Basketball> singleScore).getQuarter(),
-                        stamp: singleScore.getStamp(),
-                        state: singleScore.getState(),
-                        teams: singleScore.getTeams(),
-                        timer: singleScore.getTimer()
-                    })
+                    let updateResult = await gameList.findByIdAndUpdate(singleScore.getId(), singleScore.toObject());
                 }
                 this.log("Auto saved complete!");
                 this.lastSave = this.scoreList;
@@ -61,6 +55,9 @@ export class Scoreboard3 {
     public getExpress(): ExpressServer {
         return this.expressServer;
     }
+    public addScore(game: Game): void {
+        this.scoreList.push(game);
+    }
     private async loadAllScores(): Promise<void> {
         this.scoreList = [];
         let gameList = this.getMongoDB().getModel(ModelType.SCORES);
@@ -68,8 +65,8 @@ export class Scoreboard3 {
         let data = await gameList.find({});
         for (const score of data) {
             let game: Game;
-            switch (score._id) {
-                case 1:
+            switch (score.gameType) {
+                case GameType.BASKETBALL:
                     game = new Basketball(score._id);;
                     break;
                 default:

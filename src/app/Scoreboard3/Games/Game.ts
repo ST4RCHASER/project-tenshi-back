@@ -1,10 +1,10 @@
 import { GameType, GameState, Team } from "../types";
 export class Game {
   private id: string
-  private name: string
-  private stamp: number
-  private state: GameState
-  private timer: number
+  private name: string = 'Unknown event'
+  private stamp: number = new Date().getTime();
+  private state: GameState = GameState.NOT_START
+  private timer: number = 0;
   private teams: Team[]
   constructor(id: string) {
     this.id = id;
@@ -15,6 +15,23 @@ export class Game {
     switch (this.constructor.name) {
       case "Basketball": return GameType.BASKETBALL
       default: return GameType.UNKNOWN
+    }
+  }
+  toObject(): Object {
+    let gameMeta = {} as any;
+    try {
+      gameMeta.quarter = (<any>this)?.getQuarter();
+    } catch (e) {
+      console.log('Create game meta error:', e)
+    }
+    return {
+      gameType: this.getType(),
+      name: this.getName(),
+      stamp: this.getStamp(),
+      state: this.getState(),
+      teams: this.getTeams(),
+      timer: this.getTimer(),
+      gameMeta: gameMeta,
     }
   }
   getId(): string {
@@ -51,11 +68,12 @@ export class Game {
     this.timer = newTimer;
     return this;
   }
-  setTeams(newTeams: Team[]){
+  setTeams(newTeams: Team[]) {
     this.teams = newTeams;
     return this;
   }
   setChildData(newChildData: any) {
+    // if (!newChildData.name || !newChildData.stamp || !newChildData.state || !newChildData.timer || !newChildData.teams) return this;
     this.setName(newChildData.name);
     this.setStamp(newChildData.stamp);
     this.setState(newChildData.state);
@@ -71,16 +89,18 @@ export class Game {
     this.setTimer(newChildData.timer)
     switch (this.getType()) {
       case GameType.BASKETBALL:
-        (<any>this).setQuarter(newChildData.quarter, false);
+        if (newChildData.gameMeta) {
+          (<any>this)?.setQuarter(newChildData.gameMeta.quarter, false);
+        }
         break;
     }
     return this;
   }
-  addTeam(newTeam: Team){
+  addTeam(newTeam: Team) {
     this.teams.push(newTeam);
     return this;
   }
-  removeTeam(oldTeam: Team){
+  removeTeam(oldTeam: Team) {
     let targetTeam = this.teams.findIndex(x => x == oldTeam);
     if (targetTeam > 0) {
       delete this.teams[targetTeam];

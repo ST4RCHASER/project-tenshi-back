@@ -29,6 +29,9 @@ export class SocketServer {
                 _this.onEvent(client, name, arrayData)
             });
         });
+        this.socketServer.on("connect_error", (err) => {
+            this.log(`connect_error due to ${err.message}`, LogLevel.ERROR);
+        });
         this.socketServer.on('disconnect', (client) => {
             this.onEvent(client, 'client:disconnect', []);
         })

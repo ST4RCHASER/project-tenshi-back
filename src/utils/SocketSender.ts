@@ -34,6 +34,7 @@ export class SocketSender {
         data.code = this.responseCode;
         data.message = this.responseMessage;
         data.stamp = new Date().getTime();
+        return data;
     }
     public send(targetSocket: Socket): any {
         try {
