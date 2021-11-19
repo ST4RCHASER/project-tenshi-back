@@ -1,4 +1,4 @@
-import { GameType, GameState, Team } from "../types";
+import { GameType, GameState, Team, Score } from "../types";
 export class Game {
   private id: string
   private name: string = 'Unknown event'
@@ -17,7 +17,7 @@ export class Game {
       default: return GameType.UNKNOWN
     }
   }
-  toObject(): Object {
+  toObject(): Score {
     let gameMeta = {} as any;
     try {
       gameMeta.quarter = (<any>this)?.getQuarter();
