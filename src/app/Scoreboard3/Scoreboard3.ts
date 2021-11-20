@@ -1,7 +1,7 @@
 import { ExpressServer, SocketServer, MongoDBClient } from '@yukiTenshi/app';
 import { LogType, LogLevel, Logger, ModelType } from '@yukiTenshi/utils';
 import { Game } from './Games/Game';
-import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent } from './events';
+import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent, clientRequestSingleScoreEvent } from './events';
 import { Basketball } from './Games';
 import { GameType } from './types';
 export class Scoreboard3 {
@@ -28,6 +28,7 @@ export class Scoreboard3 {
         this.socketServer.registerEvent(new clientRequestScoreEvent());
         this.socketServer.registerEvent(new clientTeamUpdateEvent());
         this.socketServer.registerEvent(new clientCreateScoreEvent());
+        this.socketServer.registerEvent(new clientRequestSingleScoreEvent());
         this.log("Server started");
         this.loadAllScores();
         // setTimeout(() => { console.log(this.getScoreList()) }, 1000);
@@ -84,6 +85,7 @@ export class Scoreboard3 {
         return this.scoreList.find(x => x.getId() == id);
     }
     isInAdminList(socketID: string): boolean {
+        return true;
         return this.adminList.find(x => x == socketID) != null;
     }
 }

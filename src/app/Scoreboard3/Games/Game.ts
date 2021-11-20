@@ -25,6 +25,7 @@ export class Game {
       console.log('Create game meta error:', e)
     }
     return {
+      id: this.id,
       gameType: this.getType(),
       name: this.getName(),
       stamp: this.getStamp(),
