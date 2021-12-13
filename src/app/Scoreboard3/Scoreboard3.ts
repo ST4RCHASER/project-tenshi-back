@@ -1,7 +1,7 @@
 import { ExpressServer, SocketServer, MongoDBClient } from '@yukiTenshi/app';
 import { LogType, LogLevel, Logger, ModelType } from '@yukiTenshi/utils';
 import { Game } from './Games/Game';
-import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent, clientRequestSingleScoreEvent } from './events';
+import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent, clientRequestSingleScoreEvent, clientDeleteScoreEvent, clientEditScoreEvent } from './events';
 import { Basketball } from './Games';
 import { GameType } from './types';
 export class Scoreboard3 {
@@ -28,6 +28,8 @@ export class Scoreboard3 {
         this.socketServer.registerEvent(new clientRequestScoreEvent());
         this.socketServer.registerEvent(new clientTeamUpdateEvent());
         this.socketServer.registerEvent(new clientCreateScoreEvent());
+        this.socketServer.registerEvent(new clientEditScoreEvent());
+        this.socketServer.registerEvent(new clientDeleteScoreEvent());
         this.socketServer.registerEvent(new clientRequestSingleScoreEvent());
         this.log("Server started");
         this.loadAllScores();
@@ -55,6 +57,17 @@ export class Scoreboard3 {
     }
     public getExpress(): ExpressServer {
         return this.expressServer;
+    }
+    public async deleteScore(id: string, delete_in_db: boolean = true) {
+        let index = this.scoreList.findIndex(x => x.getId() == id);
+        if (index != -1) {
+            this.scoreList.splice(index, 1);
+        }
+        console.log(id);
+        if (delete_in_db) {
+            console.log(delete_in_db);
+            await this.getMongoDB().getModel(ModelType.SCORES).findByIdAndDelete(id);
+        }
     }
     public addScore(game: Game): void {
         this.scoreList.push(game);

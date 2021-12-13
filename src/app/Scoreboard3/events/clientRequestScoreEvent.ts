@@ -10,7 +10,7 @@ export class clientRequestScoreEvent implements SocketEvent {
         for(const score of server.getApp().getScoreList()) {
             scoreList.push(score.toObject());
         }
-        console.log(scoreList);
+        // console.log(scoreList);
         new SocketSender('score:overall', 201, "all score list", {scores: scoreList}).send(socket);
     }
 }
