@@ -39,7 +39,7 @@ export class Scoreboard3 {
                 this.log("Starting auto save...");
                 let gameList = this.getMongoDB().getModel(ModelType.SCORES);
                 for (const singleScore of this.getScoreList()) {
-                    let updateResult = await gameList.findByIdAndUpdate(singleScore.getId(), singleScore.toObject());
+                    let updateResult = await gameList.findByIdAndUpdate(singleScore.getId(), singleScore.toObject() as any);
                 }
                 this.log("Auto saved complete!");
                 this.lastSave = this.scoreList;
