@@ -14,6 +14,7 @@ export class Game {
   getType(): GameType {
     switch (this.constructor.name) {
       case "Basketball": return GameType.BASKETBALL
+      case "FootBall": return GameType.FOOTBALL
       default: return GameType.UNKNOWN
     }
   }

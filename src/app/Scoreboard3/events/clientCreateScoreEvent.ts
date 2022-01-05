@@ -2,7 +2,7 @@ import { ModelType, SocketEvent, SocketSender } from "@yukiTenshi/utils";
 import { Socket } from "socket.io";
 import { SocketServer } from "@yukiTenshi/app";
 import { GameType } from "../types";
-import { Basketball } from "../Games";
+import { Basketball, FootBall } from "../Games";
 export class clientCreateScoreEvent implements SocketEvent {
     Enable: boolean = true
     Name: string = "score:create"
@@ -15,11 +15,15 @@ export class clientCreateScoreEvent implements SocketEvent {
             if (typeof data.stamp == 'undefined') return new SocketSender("score:create", 400, "no stamp data include").send(socket);
             if (typeof data.teams == 'undefined') return new SocketSender("score:create", 400, "no teams data include").send(socket);
             let game = undefined;
+            let scoreDB = server.getApp().getMongoDB().getModel(ModelType.SCORES);
             switch (+data.gameType) {
                 case GameType.BASKETBALL:
-                    let scoreDB = server.getApp().getMongoDB().getModel(ModelType.SCORES);
-                    let createResult = await scoreDB.create({ gameType: data.gameType });
-                    game = new Basketball(createResult._id,);
+                    let basCreateResult = await scoreDB.create({ gameType: data.gameType });
+                    game = new Basketball(basCreateResult._id,);
+                    break;
+                case GameType.FOOTBALL:
+                    let footCreateResult = await scoreDB.create({ gameType: data.gameType });
+                    game = new FootBall(footCreateResult._id,);
                     break;
                 default:
                     return new SocketSender("score:create", 400, "invalid gameType").send(socket);
