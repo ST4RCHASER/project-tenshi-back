@@ -8,7 +8,7 @@ export class FootBall extends Game {
         let inrerval = setInterval(() => {
             if (this.enable_countdown) {
                 this.countdown--;
-                if (this.countdown == 0) {
+                if (this.countdown <= 0) {
                     this.enable_countdown = false;
                     if (this.part == FootBallPart.FIRST_HALF) {
                         this.part = FootBallPart.SECOND_HALF;
@@ -20,6 +20,20 @@ export class FootBall extends Game {
                 }
             }
         }, 1000)
+    }
+    isCountingDown() {
+        return this.enable_countdown;
+    }
+    getCountdownTimer() {
+        return this.countdown;
+    }
+    setCountdownTimer(newCountdown: number) {
+        this.countdown = newCountdown;
+        return this;
+    }
+    setCountdown(newCountdown: boolean) {
+        this.enable_countdown = newCountdown;
+        return this;
     }
     setPart(newPart: FootBallPart) {
         this.part = newPart;

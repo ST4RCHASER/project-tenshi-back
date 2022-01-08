@@ -2,7 +2,7 @@ import { ExpressServer, SocketServer, MongoDBClient } from '@yukiTenshi/app';
 import { LogType, LogLevel, Logger, ModelType } from '@yukiTenshi/utils';
 import { Game } from './Games/Game';
 import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent, clientRequestSingleScoreEvent, clientDeleteScoreEvent, clientEditScoreEvent } from './events';
-import { Basketball } from './Games';
+import { Basketball, FootBall } from './Games';
 import { GameType } from './types';
 export class Scoreboard3 {
     private expressServer: ExpressServer;
@@ -82,6 +82,9 @@ export class Scoreboard3 {
             switch (score.gameType) {
                 case GameType.BASKETBALL:
                     game = new Basketball(score._id);;
+                    break;
+                case GameType.FOOTBALL:
+                    game = new FootBall(score._id);;
                     break;
                 default:
                     game = new Game(score._id);

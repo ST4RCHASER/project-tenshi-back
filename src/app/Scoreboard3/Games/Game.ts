@@ -1,3 +1,4 @@
+import { Basketball, FootBall } from ".";
 import { GameType, GameState, Team, Score } from "../types";
 export class Game {
   private id: string
@@ -22,9 +23,12 @@ export class Game {
     let gameMeta = {} as any;
     try {
       gameMeta.quarter = (<any>this)?.getQuarter();
-    } catch (e) {
-      console.log('Create game meta error:', e)
-    }
+    } catch (e) { }
+    try {
+      gameMeta.part = (<any>this)?.getPart();
+      gameMeta.countdown = (<any>this)?.getCountdownTimer();
+      gameMeta.enable_countdown = (<any>this)?.isCountingDown();
+    } catch (e) { }
     return {
       id: this.id,
       gameType: this.getType(),
@@ -92,7 +96,14 @@ export class Game {
     switch (this.getType()) {
       case GameType.BASKETBALL:
         if (newChildData.gameMeta) {
-          (<any>this)?.setQuarter(newChildData.gameMeta.quarter, false);
+          ((<any>this) as Basketball)?.setQuarter(newChildData.gameMeta.quarter);
+        }
+        break;
+      case GameType.FOOTBALL:
+        if (newChildData.gameMeta) {
+          ((<any>this) as FootBall)?.setPart(newChildData.gameMeta.part);
+          ((<any>this) as FootBall)?.setCountdownTimer(newChildData.gameMeta.countdown);
+          ((<any>this) as FootBall)?.setCountdown(newChildData.gameMeta.enable_countdown);
         }
         break;
     }
