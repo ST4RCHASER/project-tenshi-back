@@ -6,3 +6,6 @@ export { clientCreateScoreEvent } from './clientCreateScoreEvent';
 export { clientDeleteScoreEvent } from './clientDeleteScoreEvent';
 export { clientRequestSingleScoreEvent } from './clientRequestSingleScoreEvent';
 export { clientEditScoreEvent } from './clientEditScoreEvent';
+export { clientGameMetaUpdateEvent } from './clientGameMetaUpdateEvent';
+export { clientGameMetaRequestEvent } from './clientGameMetaRequestEvent';
+export { clientSubmitScoreEvent } from './clientSubmitScoreEvent';

@@ -1,4 +1,4 @@
-import { GameState, GameType, Team } from ".";
+import { GameState, GameType, Team, TimerState } from ".";
 export interface Score {
     id: string,
     gameType: GameType,
@@ -8,4 +8,5 @@ export interface Score {
     teams: Team[],
     timer: number,
     gameMeta?: any,
+    timerState: TimerState
 }

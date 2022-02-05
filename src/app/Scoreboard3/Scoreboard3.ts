@@ -1,7 +1,7 @@
 import { ExpressServer, SocketServer, MongoDBClient } from '@yukiTenshi/app';
 import { LogType, LogLevel, Logger, ModelType } from '@yukiTenshi/utils';
 import { Game } from './Games/Game';
-import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent, clientRequestSingleScoreEvent, clientDeleteScoreEvent, clientEditScoreEvent } from './events';
+import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent, clientRequestSingleScoreEvent, clientDeleteScoreEvent, clientEditScoreEvent, clientGameMetaUpdateEvent, clientGameMetaRequestEvent, clientSubmitScoreEvent } from './events';
 import { Basketball, FootBall } from './Games';
 import { GameType } from './types';
 export class Scoreboard3 {
@@ -31,6 +31,9 @@ export class Scoreboard3 {
         this.socketServer.registerEvent(new clientEditScoreEvent());
         this.socketServer.registerEvent(new clientDeleteScoreEvent());
         this.socketServer.registerEvent(new clientRequestSingleScoreEvent());
+        this.socketServer.registerEvent(new clientGameMetaUpdateEvent());
+        this.socketServer.registerEvent(new clientGameMetaRequestEvent());
+        this.socketServer.registerEvent(new clientSubmitScoreEvent());
         this.log("Server started");
         this.loadAllScores();
         // setTimeout(() => { console.log(this.getScoreList()) }, 1000);
@@ -45,6 +48,11 @@ export class Scoreboard3 {
                 this.lastSave = this.scoreList;
             }
         }, 1000 * 60);
+        setInterval(() => {
+            for (const singleScore of this.getScoreList()) {
+                singleScore.update();
+            }
+         }, 1000);
     }
     public self(): Scoreboard3 {
         return this;
@@ -63,9 +71,7 @@ export class Scoreboard3 {
         if (index != -1) {
             this.scoreList.splice(index, 1);
         }
-        console.log(id);
         if (delete_in_db) {
-            console.log(delete_in_db);
             await this.getMongoDB().getModel(ModelType.SCORES).findByIdAndDelete(id);
         }
     }

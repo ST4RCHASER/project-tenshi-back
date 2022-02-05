@@ -1,12 +1,14 @@
 import { Basketball, FootBall } from ".";
-import { GameType, GameState, Team, Score } from "../types";
+import { GameType, GameState, Team, Score, TimerState } from "../types";
+import { BasketballQuarter } from "./BasketballQuarter";
 export class Game {
-  private id: string
+  public id: string
   private name: string = 'Unknown event'
   private stamp: number = new Date().getTime();
   private state: GameState = GameState.NOT_START
   private timer: number = 0;
   private teams: Team[]
+  private timerState: TimerState = TimerState.STOPED;
   constructor(id: string) {
     this.id = id;
     return this;
@@ -16,15 +18,17 @@ export class Game {
     switch (this.constructor.name) {
       case "Basketball": return GameType.BASKETBALL
       case "FootBall": return GameType.FOOTBALL
+      case "BasketballQuarter": return GameType.BASKETBALL_QUARTER
       default: return GameType.UNKNOWN
     }
   }
   toObject(): Score {
     let gameMeta = {} as any;
-    try {
-      gameMeta.quarter = (<any>this)?.getQuarter();
-    } catch (e) { }
-    try {
+    try { //Basketball & BasketballQuarter
+      gameMeta.quarters = (<any>this)?.getObjectQuarterList();
+    } catch (e) {
+    }
+    try { //FootBall
       gameMeta.part = (<any>this)?.getPart();
       gameMeta.countdown = (<any>this)?.getCountdownTimer();
       gameMeta.enable_countdown = (<any>this)?.isCountingDown();
@@ -38,6 +42,7 @@ export class Game {
       teams: this.getTeams(),
       timer: this.getTimer(),
       gameMeta: gameMeta,
+      timerState: this.timerState
     }
   }
   getId(): string {
@@ -78,11 +83,17 @@ export class Game {
     this.teams = newTeams;
     return this;
   }
+  setTimerState(timerState: TimerState) {
+    this.timerState = timerState;
+    return this;
+  }
   setChildData(newChildData: any) {
     // if (!newChildData.name || !newChildData.stamp || !newChildData.state || !newChildData.timer || !newChildData.teams) return this;
     this.setName(newChildData.name);
     this.setStamp(newChildData.stamp);
     this.setState(newChildData.state);
+    this.setTimer(newChildData.timer);
+    this.setTimerState(newChildData.timerState);
     let teams: Team[] = [];
     for (const ResultTeam of newChildData.teams) {
       let team: Team = {
@@ -94,10 +105,23 @@ export class Game {
     this.setTeams(teams)
     this.setTimer(newChildData.timer)
     switch (this.getType()) {
+      case GameType.BASKETBALL_QUARTER:
+        if (newChildData.gameMeta) {
+          ((<any>this) as BasketballQuarter)?.setQuarter(newChildData.quarter);
+        }
+        break;
       case GameType.BASKETBALL:
         if (newChildData.gameMeta) {
-          ((<any>this) as Basketball)?.setQuarter(newChildData.gameMeta.quarter);
+          ((<any>this) as Basketball)?.setQuarterList(newChildData.gameMeta.quarters);
         }
+        let team_a_score = 0;
+        let team_b_score = 0;
+        for (const qscore of (<any>this).getQuarterList()) {
+          team_a_score += qscore.getTeams()[0].score;
+          team_b_score += qscore.getTeams()[1].score;
+        }
+        this.getTeams()[0].score = team_a_score;
+        this.getTeams()[1].score = team_b_score;
         break;
       case GameType.FOOTBALL:
         if (newChildData.gameMeta) {
@@ -121,6 +145,25 @@ export class Game {
     return this;
   }
   slef() {
+    return this;
+  }
+  update() {
+    switch (this.getType()) {
+      case GameType.BASKETBALL:
+        for (const basquarter of (<any>this).quarterList) {
+          let basQuarter: BasketballQuarter = basquarter;
+          basQuarter.update();
+        }
+        break;
+    }
+    switch (this.timerState) {
+      case TimerState.COUNTING_DOWN:
+        if (this.timer > 0) this.timer--;
+        break;
+      case TimerState.COUNTING_UP:
+        this.timer++;
+        break;
+    }
     return this;
   }
 }
