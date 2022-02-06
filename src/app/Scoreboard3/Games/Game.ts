@@ -19,6 +19,13 @@ export class Game {
       case "Basketball": return GameType.BASKETBALL
       case "FootBall": return GameType.FOOTBALL
       case "BasketballQuarter": return GameType.BASKETBALL_QUARTER
+      case "Volleyball": return GameType.VOLLEYBALL
+      case "VolleyballSet": return GameType.VOLLEYBALL_SET
+      case "Petanque": return GameType.PETANQUE
+      case "Muzzle": return GameType.MUZZLE
+      case "MuzzleSet": return GameType.MUZZLE_SET
+      case "Badminton": return GameType.BADMINTON
+      case "BadmintonSet": return GameType.BADMINTON_SET
       default: return GameType.UNKNOWN
     }
   }
@@ -26,6 +33,10 @@ export class Game {
     let gameMeta = {} as any;
     try { //Basketball & BasketballQuarter
       gameMeta.quarters = (<any>this)?.getObjectQuarterList();
+    } catch (e) {
+    }
+    try { //Game has sets
+      gameMeta.sets = (<any>this)?.getObjectSetsList();
     } catch (e) {
     }
     try { //FootBall
@@ -104,6 +115,11 @@ export class Game {
     }
     this.setTeams(teams)
     this.setTimer(newChildData.timer)
+    try {
+      if (newChildData.gameMeta) {
+        ((<any>this) as any)?.setSetsList(newChildData.gameMeta.sets);
+      }
+    }catch(e){}
     switch (this.getType()) {
       case GameType.BASKETBALL_QUARTER:
         if (newChildData.gameMeta) {
@@ -154,6 +170,13 @@ export class Game {
           let basQuarter: BasketballQuarter = basquarter;
           basQuarter.update();
         }
+        break;
+      default:
+        try{
+          for (const set of (<any>this).setsList) {
+            set.update();
+          }
+        } catch(e){}
         break;
     }
     switch (this.timerState) {

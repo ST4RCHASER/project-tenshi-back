@@ -2,8 +2,11 @@ import { ExpressServer, SocketServer, MongoDBClient } from '@yukiTenshi/app';
 import { LogType, LogLevel, Logger, ModelType } from '@yukiTenshi/utils';
 import { Game } from './Games/Game';
 import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent, clientRequestSingleScoreEvent, clientDeleteScoreEvent, clientEditScoreEvent, clientGameMetaUpdateEvent, clientGameMetaRequestEvent, clientSubmitScoreEvent } from './events';
-import { Basketball, FootBall } from './Games';
+import { Basketball, FootBall, Volleyball } from './Games';
 import { GameType } from './types';
+import { Petanque } from './Games/Petanque';
+import { Badminton } from './Games/Badminton';
+import { Muzzle } from './Games/Muzzle';
 export class Scoreboard3 {
     private expressServer: ExpressServer;
     private socketServer: SocketServer;
@@ -52,7 +55,7 @@ export class Scoreboard3 {
             for (const singleScore of this.getScoreList()) {
                 singleScore.update();
             }
-         }, 1000);
+        }, 1000);
     }
     public self(): Scoreboard3 {
         return this;
@@ -91,6 +94,18 @@ export class Scoreboard3 {
                     break;
                 case GameType.FOOTBALL:
                     game = new FootBall(score._id);;
+                    break;
+                case GameType.VOLLEYBALL:
+                    game = new Volleyball(score._id);;
+                    break;
+                case GameType.PETANQUE:
+                    game = new Petanque(score._id);;
+                    break;
+                case GameType.BADMINTON:
+                    game = new Badminton(score._id);
+                    break;
+                case GameType.MUZZLE:
+                    game = new Muzzle(score._id);
                     break;
                 default:
                     game = new Game(score._id);
