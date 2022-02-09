@@ -6,6 +6,6 @@ export class clientRequestSingleScoreEvent implements SocketEvent {
     Name: string = "score:single"
     async Run(socket: Socket, server: SocketServer, data: any) {
         let score = await server.getApp().getScoreByID(data.id)
-        new SocketSender('score:single', 201, `single score: ${data.id}`, {score: score?.toObject()}).send(socket);
+        new SocketSender('score:single', 201, `single score: ${data.id}`, {score: score?.toObject()}).send(socket,server);
     }
 }

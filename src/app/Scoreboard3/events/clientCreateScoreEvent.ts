@@ -14,11 +14,11 @@ export class clientCreateScoreEvent implements SocketEvent {
     async Run(socket: Socket, server: SocketServer, data: any) {
         try {
             if (typeof data === "string") data = JSON.parse(data);
-            if (typeof data == 'undefined') return new SocketSender("score:create", 400, "no data include").send(socket);
-            if (typeof data.gameType == 'undefined') return new SocketSender("score:create", 400, "no game type include").send(socket);
-            if (typeof data.name == 'undefined') return new SocketSender("score:create", 400, "no name data include").send(socket);
-            if (typeof data.stamp == 'undefined') return new SocketSender("score:create", 400, "no stamp data include").send(socket);
-            if (typeof data.teams == 'undefined') return new SocketSender("score:create", 400, "no teams data include").send(socket);
+            if (typeof data == 'undefined') return new SocketSender("score:create", 400, "no data include").send(socket,server);
+            if (typeof data.gameType == 'undefined') return new SocketSender("score:create", 400, "no game type include").send(socket,server);
+            if (typeof data.name == 'undefined') return new SocketSender("score:create", 400, "no name data include").send(socket,server);
+            if (typeof data.stamp == 'undefined') return new SocketSender("score:create", 400, "no stamp data include").send(socket,server);
+            if (typeof data.teams == 'undefined') return new SocketSender("score:create", 400, "no teams data include").send(socket,server);
             let game = undefined;
             let scoreDB = server.getApp().getMongoDB().getModel(ModelType.SCORES);
             switch (+data.gameType) {
@@ -47,9 +47,9 @@ export class clientCreateScoreEvent implements SocketEvent {
                     game = new Muzzle(muzCreateResult._id);
                     break;
                 default:
-                    return new SocketSender("score:create", 400, "invalid gameType").send(socket);
+                    return new SocketSender("score:create", 400, "invalid gameType").send(socket,server);
             }
-            if (typeof game == 'undefined') return new SocketSender("score:create", 400, "create failed").send(socket);
+            if (typeof game == 'undefined') return new SocketSender("score:create", 400, "create failed").send(socket,server);
             game.setName(data.name);
             game.setStamp(data.stamp);
             game.setTeams(data.teams);
@@ -87,10 +87,10 @@ export class clientCreateScoreEvent implements SocketEvent {
                 default:
             }
             server.getApp().addScore(game);
-            new SocketSender('score:create', 201, "score created", { score: game.toObject() }).send(socket);
+            new SocketSender('score:create', 201, "score created", { score: game.toObject() }).send(socket,server);
         } catch (err) { 
             console.log(err);
-            return new SocketSender("score:create", 400, "invalid data").send(socket);
+            return new SocketSender("score:create", 400, "invalid data").send(socket,server);
         }
     }
 }

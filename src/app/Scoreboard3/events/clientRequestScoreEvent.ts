@@ -11,6 +11,6 @@ export class clientRequestScoreEvent implements SocketEvent {
             scoreList.push(score.toObject());
         }
         // console.log(scoreList);
-        new SocketSender('score:overall', 201, "all score list", {scores: scoreList}).send(socket);
+        new SocketSender('score:overall', 201, "all score list", {scores: scoreList}).send(socket,server);
     }
 }

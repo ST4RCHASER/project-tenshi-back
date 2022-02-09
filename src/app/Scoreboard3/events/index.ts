@@ -9,3 +9,4 @@ export { clientEditScoreEvent } from './clientEditScoreEvent';
 export { clientGameMetaUpdateEvent } from './clientGameMetaUpdateEvent';
 export { clientGameMetaRequestEvent } from './clientGameMetaRequestEvent';
 export { clientSubmitScoreEvent } from './clientSubmitScoreEvent';
+export { clientSubmitAdminEvent } from './clientSubmitAdminEvent'

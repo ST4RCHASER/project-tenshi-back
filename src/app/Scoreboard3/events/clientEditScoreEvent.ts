@@ -9,16 +9,16 @@ export class clientEditScoreEvent implements SocketEvent {
     async Run(socket: Socket, server: SocketServer, data: any) {
         try {
             if (typeof data === "string") data = JSON.parse(data);
-            if (typeof data == 'undefined') return new SocketSender("score:edit", 400, "no data include").send(socket);
-            if (typeof data.id == 'undefined') return new SocketSender("score:edit", 400, "no id include").send(socket);
+            if (typeof data == 'undefined') return new SocketSender("score:edit", 400, "no data include").send(socket,server);
+            if (typeof data.id == 'undefined') return new SocketSender("score:edit", 400, "no id include").send(socket,server);
             let game = server.getApp().getScoreByID(data.id);
-            if (typeof game == 'undefined') return new SocketSender("score:edit", 400, "edit failed this score not found").send(socket);
+            if (typeof game == 'undefined') return new SocketSender("score:edit", 400, "edit failed this score not found").send(socket,server);
             if (typeof data.name != 'undefined') game.setName(data.name);
             if (typeof data.stamp != 'undefined')  game.setStamp(data.stamp);
             if (typeof data.fb_part != 'undefined' && game.getType() == GameType.FOOTBALL)  (game as FootBall)?.setPart(data.fb_part);
-            new SocketSender('score:edit', 201, "score edited", { score: game.toObject() }).send(socket);
+            new SocketSender('score:edit', 201, "score edited", { score: game.toObject() }).send(socket,server);
         } catch (err) {
-            return new SocketSender("score:edit", 400, "invalid data").send(socket);
+            return new SocketSender("score:edit", 400, "invalid data").send(socket,server);
         }
     }
 }

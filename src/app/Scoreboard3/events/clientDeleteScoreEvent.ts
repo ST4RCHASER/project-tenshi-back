@@ -7,13 +7,13 @@ export class clientDeleteScoreEvent implements SocketEvent {
     async Run(socket: Socket, server: SocketServer, data: any) {
         try {
             if (typeof data === "string") data = JSON.parse(data);
-            if (typeof data == 'undefined') return new SocketSender("score:delete", 400, "no data include").send(socket);
-            if (typeof data.id == 'undefined') return new SocketSender("score:delete", 400, "no id include").send(socket);
+            if (typeof data == 'undefined') return new SocketSender("score:delete", 400, "no data include").send(socket,server);
+            if (typeof data.id == 'undefined') return new SocketSender("score:delete", 400, "no id include").send(socket,server);
             // let score: Game | undefined = server.getApp().getScoreByID(data.id);
             await server.getApp().deleteScore(data.id);
-            new SocketSender('score:delete', 201, "score deleted").send(socket);
+            new SocketSender('score:delete', 201, "score deleted").send(socket,server);
         } catch (err) {
-            return new SocketSender("score:delete", 400, "invalid data").send(socket);
+            return new SocketSender("score:delete", 400, "invalid data").send(socket,server);
         }
     }
 }

@@ -1,7 +1,7 @@
 import { ExpressServer, SocketServer, MongoDBClient } from '@yukiTenshi/app';
 import { LogType, LogLevel, Logger, ModelType } from '@yukiTenshi/utils';
 import { Game } from './Games/Game';
-import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent, clientRequestSingleScoreEvent, clientDeleteScoreEvent, clientEditScoreEvent, clientGameMetaUpdateEvent, clientGameMetaRequestEvent, clientSubmitScoreEvent } from './events';
+import { clientConnectedEvent, clientDisconnectEvent, clientRequestScoreEvent, clientTeamUpdateEvent, clientCreateScoreEvent, clientRequestSingleScoreEvent, clientDeleteScoreEvent, clientEditScoreEvent, clientGameMetaUpdateEvent, clientGameMetaRequestEvent, clientSubmitScoreEvent, clientSubmitAdminEvent } from './events';
 import { Basketball, FootBall, Volleyball } from './Games';
 import { GameType } from './types';
 import { Petanque } from './Games/Petanque';
@@ -14,7 +14,7 @@ export class Scoreboard3 {
     private logger: Logger;
     private scoreList: Game[]
     private lastSave: Game[]
-    private adminList: string[];
+    private adminList: string[] = [];
     constructor(expressServer: ExpressServer, socketServer: SocketServer, mongodb: MongoDBClient) {
         this.expressServer = expressServer;
         this.socketServer = socketServer;
@@ -37,6 +37,7 @@ export class Scoreboard3 {
         this.socketServer.registerEvent(new clientGameMetaUpdateEvent());
         this.socketServer.registerEvent(new clientGameMetaRequestEvent());
         this.socketServer.registerEvent(new clientSubmitScoreEvent());
+        this.socketServer.registerEvent(new clientSubmitAdminEvent());
         this.log("Server started");
         this.loadAllScores();
         // setTimeout(() => { console.log(this.getScoreList()) }, 1000);
@@ -122,7 +123,9 @@ export class Scoreboard3 {
         return this.scoreList.find(x => x.getId() == id);
     }
     isInAdminList(socketID: string): boolean {
-        return true;
         return this.adminList.find(x => x == socketID) != null;
+    }
+    addAdmin(socketID: string){
+        this.adminList.push(socketID);
     }
 }

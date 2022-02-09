@@ -7,18 +7,18 @@ export class clientTeamUpdateEvent implements SocketEvent {
     Name: string = 'team:update'
     Run(socket: Socket, server: SocketServer, data: any) {
         if (server.getApp().isInAdminList(socket.id)) {
-            if (typeof data == undefined) return new SocketSender("team:update", 400, "no data include").send(socket);
-            if (typeof data.id == undefined) return new SocketSender("team:update", 400, "no game id include").send(socket);
-            if (typeof data.teams == undefined) return new SocketSender("team:update", 400, "no team data include").send(socket);
+            if (typeof data == undefined) return new SocketSender("team:update", 400, "no data include").send(socket,server);
+            if (typeof data.id == undefined) return new SocketSender("team:update", 400, "no game id include").send(socket,server);
+            if (typeof data.teams == undefined) return new SocketSender("team:update", 400, "no team data include").send(socket,server);
             let score: Game | undefined = server.getApp().getScoreByID(data.id);
             if (typeof score == 'undefined') {
-                if (typeof data.teams == undefined) return new SocketSender("team:update", 400, `can't update game id ${data.id} not found`).send(socket);
+                if (typeof data.teams == undefined) return new SocketSender("team:update", 400, `can't update game id ${data.id} not found`).send(socket,server);
             } else {
                 score.setTeams(data.teams);
-                new SocketSender("team:update", 201, `team id ${data.id} update`, {id: score.getId(), teams: score.getTeams()}).sendToAll(socket);
+                new SocketSender("team:update", 201, `team id ${data.id} update`, {id: score.getId(), teams: score.getTeams()}).sendToAll(server);
             }
         } else {
-            return new SocketSender("team:update", 400, "This event require auth").send(socket);
+            return new SocketSender("team:update", 400, "This event require auth").send(socket,server);
         }
     }
 }
