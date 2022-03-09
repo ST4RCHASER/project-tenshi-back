@@ -27,6 +27,7 @@ export class clientCreateScoreEvent implements SocketEvent {
                 case GameType.FOOTBALL_SET:
                     let footballCreateResult = await scoreDB.create({gameType: data.gameType});
                     game = new FootballSet(footballCreateResult.id);
+                    break;
                 case GameType.BASKETBALL:
                     let basCreateResult = await scoreDB.create({ gameType: data.gameType });
                     game = new Basketball(basCreateResult._id);
@@ -61,9 +62,10 @@ export class clientCreateScoreEvent implements SocketEvent {
             switch (+data.gameType) {
                 case GameType.FOOTBALL_SET:
                     (game as FootballSet).setSetsList([
-                        new FootballSetRound('ครึ่งแรก').setStamp(data.stamp).setTeams(data.teams).setName(data.name),
-                        new FootballSetRound('ครึ่งหลัง').setStamp(data.stamp).setTeams(data.teams).setName(data.name)
+                        new FootballSetRound('1').setStamp(data.stamp).setTeams(data.teams).setName('ครึ่งแรก'),
+                        new FootballSetRound('2').setStamp(data.stamp).setTeams(data.teams).setName('ครึ่งหลัง')
                     ]);
+                    break;
                 case GameType.BASKETBALL:
                     (game as Basketball).setQuarterList([
                         new BasketballQuarter('1').setQuarter(1).setStamp(data.stamp).setName(data.name + 'Quarter 1').setTeams(data.teams),
