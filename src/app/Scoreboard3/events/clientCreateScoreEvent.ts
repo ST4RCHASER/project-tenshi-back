@@ -2,12 +2,14 @@ import { ModelType, SocketEvent, SocketSender } from "@yukiTenshi/utils";
 import { Socket } from "socket.io";
 import { SocketServer } from "@yukiTenshi/app";
 import { GameType } from "../types";
-import { Basketball, BasketballQuarter, FootBall, Volleyball, VolleyballSet } from "../Games";
+import { Basketball, BasketballQuarter, FootBall, Game, Volleyball, VolleyballSet } from "../Games";
 import { Petanque } from "../Games/Petanque";
 import { Muzzle } from "../Games/Muzzle";
 import { Badminton } from "../Games/Badminton";
 import { BadmintonSet } from "../Games/BadmintonSet";
 import { MuzzleSet } from "../Games/MuzzleSet";
+import { FootballSet } from "../Games/FootballSet";
+import { FootballSetRound } from "../Games/FootballSetRound";
 export class clientCreateScoreEvent implements SocketEvent {
     Enable: boolean = true
     Name: string = "score:create"
@@ -22,6 +24,9 @@ export class clientCreateScoreEvent implements SocketEvent {
             let game = undefined;
             let scoreDB = server.getApp().getMongoDB().getModel(ModelType.SCORES);
             switch (+data.gameType) {
+                case GameType.FOOTBALL_SET:
+                    let footballCreateResult = await scoreDB.create({gameType: data.gameType});
+                    game = new FootballSet(footballCreateResult.id);
                 case GameType.BASKETBALL:
                     let basCreateResult = await scoreDB.create({ gameType: data.gameType });
                     game = new Basketball(basCreateResult._id);
@@ -54,13 +59,17 @@ export class clientCreateScoreEvent implements SocketEvent {
             game.setStamp(data.stamp);
             game.setTeams(data.teams);
             switch (+data.gameType) {
+                case GameType.FOOTBALL_SET:
+                    (game as FootballSet).setSetsList([
+                        new FootballSetRound('ครึ่งแรก').setStamp(data.stamp).setTeams(data.teams).setName(data.name),
+                        new FootballSetRound('ครึ่งหลัง').setStamp(data.stamp).setTeams(data.teams).setName(data.name)
+                    ]);
                 case GameType.BASKETBALL:
                     (game as Basketball).setQuarterList([
                         new BasketballQuarter('1').setQuarter(1).setStamp(data.stamp).setName(data.name + 'Quarter 1').setTeams(data.teams),
                         new BasketballQuarter('2').setQuarter(2).setStamp(data.stamp).setName(data.name + 'Quarter 2').setTeams(data.teams),
                         new BasketballQuarter('3').setQuarter(3).setStamp(data.stamp).setName(data.name + 'Quarter 3').setTeams(data.teams),
                         new BasketballQuarter('4').setQuarter(4).setStamp(data.stamp).setName(data.name + 'Quarter 4').setTeams(data.teams),
-
                     ]);
                     break;
                 case GameType.VOLLEYBALL:

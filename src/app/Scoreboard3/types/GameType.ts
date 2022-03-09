@@ -11,4 +11,6 @@ export enum GameType {
     MUZZLE_SET  = 8,
     BADMINTON = 9,
     BADMINTON_SET = 10,
+    FOOTBALL_SET = 11,
+    FOOTBALL_SET_ROUND = 12,
 } 

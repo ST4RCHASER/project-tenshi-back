@@ -26,6 +26,8 @@ export class Game {
       case "MuzzleSet": return GameType.MUZZLE_SET
       case "Badminton": return GameType.BADMINTON
       case "BadmintonSet": return GameType.BADMINTON_SET
+      case "FootballSet": return GameType.FOOTBALL_SET
+      case "FootballSetRound": return GameType.FOOTBALL_SET_ROUND
       default: return GameType.UNKNOWN
     }
   }
