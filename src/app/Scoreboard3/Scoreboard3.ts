@@ -7,6 +7,7 @@ import { GameType } from './types';
 import { Petanque } from './Games/Petanque';
 import { Badminton } from './Games/Badminton';
 import { Muzzle } from './Games/Muzzle';
+import { FootballSet } from './Games/FootballSet';
 export class Scoreboard3 {
     private expressServer: ExpressServer;
     private socketServer: SocketServer;
@@ -96,6 +97,9 @@ export class Scoreboard3 {
                 case GameType.FOOTBALL:
                     game = new FootBall(score._id);;
                     break;
+                case GameType.FOOTBALL_SET:
+                    game = new FootballSet(score._id);;
+                    break;
                 case GameType.VOLLEYBALL:
                     game = new Volleyball(score._id);;
                     break;
@@ -125,7 +129,7 @@ export class Scoreboard3 {
     isInAdminList(socketID: string): boolean {
         return this.adminList.find(x => x == socketID) != null;
     }
-    addAdmin(socketID: string){
+    addAdmin(socketID: string) {
         this.adminList.push(socketID);
     }
 }
